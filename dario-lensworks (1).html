@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dario Lensworks</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,700&family=Tenor+Sans&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#c9a84c; --gold2:#e8d48b; --gold3:#8a6820;
+  --black:#080808; --black2:#101010; --black3:#181818; --black4:#1e1e1e;
+  --offwhite:#f0ead8; --muted:#9a9080; --line:rgba(201,168,76,0.15);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--offwhite);font-family:'Jost',sans-serif;font-weight:300;overflow-x:hidden;cursor:none;}
+
+/* CURSOR */
+#cur{position:fixed;width:8px;height:8px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width .25s,height .25s;}
+#cur-r{position:fixed;width:32px;height:32px;border:1px solid rgba(201,168,76,.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s;}
+
+/* GRAIN */
+.grain{position:fixed;inset:0;pointer-events:none;z-index:9997;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");}
+
+/* HEADER */
+header{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 60px;display:flex;align-items:center;justify-content:space-between;height:72px;background:linear-gradient(to bottom,rgba(8,8,8,.97) 0%,rgba(8,8,8,0) 100%);backdrop-filter:blur(3px);}
+.logo-wrap{display:flex;flex-direction:column;gap:2px;}
+.logo-main{font-family:'Playfair Display',serif;font-size:20px;font-style:italic;font-weight:700;background:linear-gradient(90deg,var(--gold3),var(--gold2),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1px;}
+.logo-sub{font-family:'Tenor Sans',sans-serif;font-size:8px;letter-spacing:5px;color:var(--muted);text-transform:uppercase;}
+nav{display:flex;gap:34px;list-style:none;}
+nav a{font-family:'Tenor Sans',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .3s;cursor:none;}
+nav a:hover{color:var(--gold2);}
+.nav-cta{padding:10px 24px;border:1px solid rgba(201,168,76,.4);color:var(--gold)!important;transition:background .3s,border-color .3s!important;}
+.nav-cta:hover{background:rgba(201,168,76,.1)!important;border-color:var(--gold)!important;}
+
+/* HERO */
+.hero{min-height:100vh;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 60% 50%,rgba(140,100,20,.12) 0%,transparent 70%),radial-gradient(ellipse 40% 80% at 20% 30%,rgba(201,168,76,.04) 0%,transparent 60%),var(--black);}
+.hero-img{position:absolute;inset:0;}
+.hero-vignette{position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 30%,rgba(8,8,8,.95) 100%);}
+.hero-corner{position:absolute;width:80px;height:80px;}
+.hero-corner.tl{top:90px;left:50px;border-top:1px solid rgba(201,168,76,.3);border-left:1px solid rgba(201,168,76,.3);}
+.hero-corner.tr{top:90px;right:50px;border-top:1px solid rgba(201,168,76,.3);border-right:1px solid rgba(201,168,76,.3);}
+.hero-corner.bl{bottom:40px;left:50px;border-bottom:1px solid rgba(201,168,76,.3);border-left:1px solid rgba(201,168,76,.3);}
+.hero-corner.br{bottom:40px;right:50px;border-bottom:1px solid rgba(201,168,76,.3);border-right:1px solid rgba(201,168,76,.3);}
+.hero-content{position:relative;z-index:2;text-align:center;padding:0 24px;display:flex;flex-direction:column;align-items:center;}
+.hero-eyebrow{font-family:'Tenor Sans',sans-serif;font-size:10px;letter-spacing:8px;text-transform:uppercase;color:var(--gold);margin-bottom:28px;opacity:0;animation:fadeUp 1s ease forwards .2s;display:flex;align-items:center;gap:18px;}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:36px;height:1px;background:linear-gradient(to right,transparent,var(--gold));}
+.hero-eyebrow::after{transform:rotate(180deg);}
+.hero-name{font-family:'Playfair Display',serif;font-size:clamp(72px,14vw,160px);font-style:italic;font-weight:900;line-height:.85;background:linear-gradient(160deg,var(--gold3) 0%,var(--gold2) 35%,var(--gold) 55%,var(--gold3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;animation:fadeUp 1.2s ease forwards .45s;filter:drop-shadow(0 0 60px rgba(201,168,76,.15));}
+.hero-brand{font-family:'Tenor Sans',sans-serif;font-size:clamp(12px,2vw,18px);letter-spacing:12px;text-transform:uppercase;color:rgba(240,234,216,.5);margin-top:16px;opacity:0;animation:fadeUp 1s ease forwards .7s;}
+.hero-divider{width:160px;height:1px;margin:36px auto;background:linear-gradient(to right,transparent,var(--gold),transparent);opacity:0;animation:fadeIn 1s ease forwards 1s;}
+.hero-desc{font-family:'Jost',sans-serif;font-weight:200;font-size:15px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;opacity:0;animation:fadeUp 1s ease forwards 1.1s;max-width:500px;line-height:2;}
+.hero-btns{display:flex;gap:16px;margin-top:48px;opacity:0;animation:fadeUp 1s ease forwards 1.4s;}
+.btn-primary{padding:16px 42px;background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));color:var(--black);font-family:'Tenor Sans',sans-serif;font-size:10px;letter-spacing:4px;text-transform:uppercase;text-decoration:none;cursor:none;border:none;transition:transform .3s,box-shadow .3s;box-shadow:0 8px 40px rgba(201,168,76,.25);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 50px rgba(201,168,76,.35);}
+.btn-outline{padding:16px 42px;border:1px solid rgba(201,168,76,.35);color:var(--offwhite);font-family:'Tenor Sans',sans-serif;font-size:10px;letter-spacing:4px;text-transform:uppercase;text-decoration:none;cursor:none;transition:border-color .3s,color .3s,background .3s;}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold2);background:rgba(201,168,76,.06);}
+.scroll-ind{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;animation:fadeIn 1.5s ease forwards 2s;}
+.scroll-ind span{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);}
+.scroll-line{width:1px;height:48px;background:linear-gradient(to bottom,var(--gold),transparent);animation:scrollPulse 2s ease-in-out infinite;}
+@keyframes scrollPulse{0%,100%{opacity:.4;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.1)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* SECTIONS */
+section{padding:110px 60px;}
+.sec-tag{display:inline-flex;align-items:center;gap:14px;font-family:'Tenor Sans',sans-serif;font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:18px;}
+.sec-tag::before{content:'';width:32px;height:1px;background:var(--gold);}
+.sec-h{font-family:'Playfair Display',serif;font-size:clamp(34px,5vw,58px);font-weight:400;font-style:italic;line-height:1.1;color:var(--offwhite);}
+.sec-h em{font-style:normal;color:var(--gold2);}
+
+/* ABOUT — no image, balanced two-column layout */
+.about-sec{background:var(--black);}
+.about-wrap{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+.about-left{padding-right:20px;}
+.about-lead{font-family:'Playfair Display',serif;font-style:italic;font-size:22px;color:var(--offwhite);line-height:1.65;margin-bottom:28px;font-weight:400;border-left:2px solid var(--gold);padding-left:24px;}
+.about-p{font-size:15px;color:var(--muted);line-height:1.95;margin-bottom:16px;}
+.about-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:44px;border:1px solid var(--line);}
+.astat{padding:28px 20px;text-align:center;background:var(--black2);border-right:1px solid var(--line);}
+.astat:last-child{border-right:none;}
+.astat-n{font-family:'Playfair Display',serif;font-style:italic;font-size:42px;line-height:1;background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.astat-l{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:8px;}
+
+/* About right — decorative info panel */
+.about-right{display:flex;flex-direction:column;gap:2px;}
+.about-info-card{background:var(--black3);border:1px solid var(--line);padding:32px 36px;position:relative;overflow:hidden;transition:border-color .3s;}
+.about-info-card:hover{border-color:rgba(201,168,76,.35);}
+.about-info-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,transparent,var(--gold),transparent);transform:scaleY(0);transition:transform .4s;}
+.about-info-card:hover::before{transform:scaleY(1);}
+.aic-label{font-family:'Tenor Sans',sans-serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.aic-value{font-family:'Playfair Display',serif;font-size:18px;color:var(--offwhite);}
+.aic-sub{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6;}
+.about-quote{background:var(--black2);border:1px solid var(--line);padding:40px 36px;text-align:center;margin-top:2px;}
+.about-quote-txt{font-family:'Playfair Display',serif;font-style:italic;font-size:19px;color:var(--offwhite);line-height:1.65;margin-bottom:16px;}
+.about-quote-sig{font-family:'Tenor Sans',sans-serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);}
+
+/* SKILLS — SVG icon list style */
+.skills-sec{background:var(--black2);}
+.skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:64px;max-width:1100px;border:1px solid var(--line);}
+.sk-card{background:var(--black3);padding:44px 36px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);position:relative;overflow:hidden;transition:background .4s;}
+.sk-card:hover{background:var(--black4);}
+.sk-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform .5s ease;}
+.sk-card:hover::after{transform:scaleX(1);}
+.sk-num{font-family:'Playfair Display',serif;font-style:italic;font-size:52px;color:rgba(201,168,76,.07);position:absolute;top:20px;right:24px;line-height:1;transition:color .4s;}
+.sk-card:hover .sk-num{color:rgba(201,168,76,.15);}
+
+/* SVG icon circle */
+.sk-ico-wrap{width:52px;height:52px;border:1px solid rgba(201,168,76,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:22px;background:rgba(201,168,76,.05);transition:border-color .4s,background .4s;}
+.sk-card:hover .sk-ico-wrap{border-color:var(--gold);background:rgba(201,168,76,.1);}
+.sk-ico-wrap svg{width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke .3s;}
+.sk-card:hover .sk-ico-wrap svg{stroke:var(--gold2);}
+.sk-name{font-family:'Tenor Sans',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);margin-bottom:14px;}
+.sk-desc{font-size:13.5px;line-height:1.85;color:var(--muted);}
+
+/* PROCESS */
+.process-sec{background:var(--black);}
+.process-inner{max-width:1100px;margin:0 auto;}
+.process-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:72px;position:relative;}
+.proc-connector{position:absolute;top:36px;left:calc(12.5% + 18px);right:calc(12.5% + 18px);height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.3),rgba(201,168,76,.6),rgba(201,168,76,.3),transparent);}
+.proc-step{padding:0 28px;text-align:center;position:relative;}
+.proc-num{width:72px;height:72px;border-radius:50%;border:1px solid var(--gold);background:var(--black);display:flex;align-items:center;justify-content:center;margin:0 auto 28px;position:relative;z-index:1;font-family:'Playfair Display',serif;font-style:italic;font-size:26px;color:var(--gold);transition:background .4s,color .4s;}
+.proc-step:hover .proc-num{background:var(--gold);color:var(--black);}
+.proc-title{font-family:'Tenor Sans',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);margin-bottom:14px;}
+.proc-desc{font-size:13px;line-height:1.85;color:var(--muted);}
+
+/* SERVICES */
+.svc-sec{background:var(--black2);}
+.svc-inner{max-width:1100px;margin:0 auto;}
+.svc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin-top:64px;border:1px solid var(--line);}
+.svc-item{background:var(--black3);padding:44px 40px;display:flex;gap:28px;align-items:flex-start;border-right:1px solid var(--line);border-bottom:1px solid var(--line);transition:background .4s;cursor:none;position:relative;overflow:hidden;}
+.svc-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,transparent,var(--gold),transparent);transform:scaleY(0);transition:transform .4s ease;}
+.svc-item:hover{background:var(--black4);}
+.svc-item:hover::before{transform:scaleY(1);}
+.svc-no{font-family:'Playfair Display',serif;font-style:italic;font-size:48px;color:rgba(201,168,76,.12);line-height:1;min-width:44px;transition:color .4s;}
+.svc-item:hover .svc-no{color:rgba(201,168,76,.25);}
+.svc-name{font-family:'Tenor Sans',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);margin-bottom:12px;}
+.svc-desc{font-size:13.5px;line-height:1.85;color:var(--muted);}
+
+/* FRAMES */
+.frames-sec{background:var(--black);}
+.frames-inner{max-width:1200px;margin:0 auto;}
+.frames-header{margin-bottom:64px;}
+.frames-intro{font-size:15px;color:var(--muted);line-height:1.9;max-width:560px;margin-top:20px;}
+.frames-main-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;grid-template-rows:auto auto;gap:14px;}
+.frame-card{position:relative;overflow:hidden;border:1px solid var(--line);cursor:none;background:var(--black3);}
+.frame-card.large{grid-row:span 2;}
+.frame-card img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.82) contrast(1.08) saturate(.9);transition:transform .7s ease,filter .5s ease;}
+.frame-card:hover img{transform:scale(1.04);filter:brightness(.92) contrast(1.04) saturate(1.1);}
+/* Gold frame overlay */
+.frame-overlay{position:absolute;inset:0;pointer-events:none;z-index:2;}
+.frame-overlay::before{content:'';position:absolute;inset:14px;border:1px solid rgba(201,168,76,.3);transition:border-color .4s;}
+.frame-card:hover .frame-overlay::before{border-color:rgba(201,168,76,.75);}
+/* Corner brackets */
+.fc{position:absolute;width:22px;height:22px;z-index:3;}
+.fc.tl{top:14px;left:14px;border-top:2px solid var(--gold);border-left:2px solid var(--gold);}
+.fc.tr{top:14px;right:14px;border-top:2px solid var(--gold);border-right:2px solid var(--gold);}
+.fc.bl{bottom:14px;left:14px;border-bottom:2px solid var(--gold);border-left:2px solid var(--gold);}
+.fc.br{bottom:14px;right:14px;border-bottom:2px solid var(--gold);border-right:2px solid var(--gold);}
+/* Loading shimmer for images */
+.frame-card{background:linear-gradient(110deg,var(--black3) 30%,var(--black4) 50%,var(--black3) 70%);background-size:200% 100%;animation:shimmer 1.6s infinite;}
+.frame-card img.loaded{animation:none;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.frame-label{position:absolute;bottom:0;left:0;right:0;z-index:4;padding:48px 20px 18px;background:linear-gradient(to top,rgba(8,8,8,.93),transparent);text-align:center;}
+.frame-type{font-family:'Tenor Sans',sans-serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);}
+.frame-desc{font-size:11.5px;color:rgba(240,234,216,.5);margin-top:5px;}
+.frame-cta-strip{margin-top:40px;padding:36px 44px;border:1px solid var(--line);background:var(--black2);display:flex;align-items:center;justify-content:space-between;gap:30px;}
+.fcs-head{font-family:'Playfair Display',serif;font-style:italic;font-size:26px;color:var(--offwhite);margin-bottom:8px;}
+.fcs-sub{font-size:13px;color:var(--muted);}
+
+/* CONTACT */
+.contact-sec{background:var(--black2);}
+.contact-inner{max-width:1000px;margin:0 auto;}
+.contact-top{text-align:center;margin-bottom:72px;}
+.contact-lead{font-size:15px;color:var(--muted);line-height:1.9;max-width:520px;margin:20px auto 0;}
+.contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid var(--line);margin-bottom:24px;}
+.con-card{background:var(--black3);padding:44px 32px;text-align:center;text-decoration:none;display:block;cursor:none;position:relative;overflow:hidden;transition:background .4s;border-right:1px solid var(--line);}
+.con-card:hover{background:var(--black4);}
+.con-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform .5s;}
+.con-card:hover::after{transform:scaleX(1);}
+.con-ico{width:54px;height:54px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;background:var(--black2);transition:border-color .3s;}
+.con-ico svg{width:22px;height:22px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.con-card:hover .con-ico{border-color:var(--gold);}
+.con-type{font-family:'Tenor Sans',sans-serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.con-val{font-size:13px;color:var(--offwhite);line-height:1.6;}
+.con-badge{display:inline-block;margin-top:10px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--black);background:var(--gold3);padding:4px 10px;}
+.contact-map-note{padding:30px 40px;border:1px solid var(--line);background:var(--black3);text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;}
+.contact-map-note svg{width:18px;height:18px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.contact-map-note p{font-size:13px;color:var(--muted);}
+.contact-map-note span{color:var(--gold2);}
+
+/* FOOTER */
+footer{border-top:1px solid var(--line);background:var(--black);padding:40px 60px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;}
+.foot-logo{font-family:'Playfair Display',serif;font-style:italic;font-size:22px;color:var(--gold);}
+.foot-mid{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.foot-name{font-family:'Tenor Sans',sans-serif;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);}
+.foot-cr{font-size:11px;color:rgba(154,144,128,.35);}
+.foot-socials{display:flex;gap:20px;}
+.foot-socials a{font-family:'Tenor Sans',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);text-decoration:none;cursor:none;transition:color .3s;}
+.foot-socials a:hover{color:var(--gold2);}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(36px);transition:opacity .9s ease,transform .9s ease;}
+.rv.on{opacity:1;transform:translateY(0);}
+.rv2{opacity:0;transform:translateY(36px);transition:opacity .9s ease .15s,transform .9s ease .15s;}
+.rv2.on{opacity:1;transform:translateY(0);}
+.rv3{opacity:0;transform:translateY(36px);transition:opacity .9s ease .28s,transform .9s ease .28s;}
+.rv3.on{opacity:1;transform:translateY(0);}
+.gline{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.2),transparent);}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  header{padding:0 24px;}nav{display:none;}
+  section{padding:70px 24px;}
+  .hero-corner{display:none;}
+  .about-wrap{grid-template-columns:1fr;}
+  .about-right{margin-top:0;}
+  .skills-grid{grid-template-columns:1fr;}
+  .process-grid{grid-template-columns:1fr 1fr;}
+  .proc-connector{display:none;}
+  .svc-grid{grid-template-columns:1fr;}
+  .frames-main-grid{grid-template-columns:1fr 1fr;}
+  .frame-card.large{grid-row:span 1;}
+  .frame-cta-strip{flex-direction:column;align-items:flex-start;}
+  .contact-grid{grid-template-columns:1fr;}
+  footer{flex-direction:column;text-align:center;}
+  .foot-socials{justify-content:center;}
+}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div id="cur"></div>
+<div id="cur-r"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-wrap">
+    <div class="logo-main">Dario Lensworks</div>
+    <div class="logo-sub">Freelance Creative Studio</div>
+  </div>
+  <nav>
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#process">Process</a>
+    <a href="#services">Services</a>
+    <a href="#frames">Frames</a>
+    <a href="#contact" class="nav-cta">Contact</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-img"></div>
+  <div class="hero-vignette"></div>
+  <div class="hero-corner tl"></div><div class="hero-corner tr"></div>
+  <div class="hero-corner bl"></div><div class="hero-corner br"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Freelance Creative &nbsp;·&nbsp; Tirunelveli</div>
+    <h1 class="hero-name">Dario</h1>
+    <div class="hero-brand">Lensworks</div>
+    <div class="hero-divider"></div>
+    <p class="hero-desc">Video Editing &nbsp;·&nbsp; Photography &nbsp;·&nbsp; Colour Grading &nbsp;·&nbsp; Memory Frames</p>
+    <div class="hero-btns">
+      <a href="#services" class="btn-primary">Explore Work</a>
+      <a href="#contact" class="btn-outline">Book a Session</a>
+    </div>
+  </div>
+  <div class="scroll-ind"><span>Scroll</span><div class="scroll-line"></div></div>
+</section>
+
+<div class="gline"></div>
+
+<!-- ABOUT — no image, balanced two-column -->
+<section id="about" class="about-sec">
+  <div class="about-wrap">
+    <!-- Left: text -->
+    <div class="about-left rv">
+      <div class="sec-tag">About</div>
+      <h2 class="sec-h">The Vision<br>Behind the <em>Lens</em></h2>
+      <div class="about-lead">"I don't just capture moments — I build emotions that last a lifetime."</div>
+      <p class="about-p">Dario Lensworks is a freelance creative studio specialising in visual storytelling, video editing, and design. With a deep passion for turning raw footage and fleeting moments into timeless art, every project is treated as a canvas.</p>
+      <p class="about-p">From cinematic wedding reels and social media content to memory frames that live on your wall forever — each deliverable is crafted with the same level of dedication, colour, and soul.</p>
+      <div class="about-stats">
+        <div class="astat"><div class="astat-n">2</div><div class="astat-l">Yrs Exp.</div></div>
+        <div class="astat"><div class="astat-n">5+</div><div class="astat-l">Projects</div></div>
+        <div class="astat"><div class="astat-n">100%</div><div class="astat-l">Passion</div></div>
+      </div>
+    </div>
+    <!-- Right: info cards -->
+    <div class="about-right rv2">
+      <div class="about-info-card">
+        <div class="aic-label">Specialisation</div>
+        <div class="aic-value">Cinematic Video Editing</div>
+        <div class="aic-sub">Colour grading, event films, reels, social media content — end-to-end post-production.</div>
+      </div>
+      <div class="about-info-card">
+        <div class="aic-label">Photography</div>
+        <div class="aic-value">Portrait &amp; Event Coverage</div>
+        <div class="aic-sub">Capturing authentic emotion through a refined artistic eye — from portraits to celebrations.</div>
+      </div>
+      <div class="about-info-card">
+        <div class="aic-label">Signature Service</div>
+        <div class="aic-value">Memory Frame Works</div>
+        <div class="aic-sub">Custom-crafted photo frames that transform your favourite photographs into permanent wall art.</div>
+      </div>
+      <div class="about-info-card">
+        <div class="aic-label">Location</div>
+        <div class="aic-value">Tirunelveli, Tamil Nadu</div>
+        <div class="aic-sub">Available across Tamil Nadu &amp; India. Remote editing services available worldwide.</div>
+      </div>
+      <div class="about-quote">
+        <div class="about-quote-txt">"Every shot is a story. Every edit is the heartbeat given to that story."</div>
+        <div class="about-quote-sig">— Dario Lensworks</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="gline"></div>
+
+<!-- SKILLS — SVG icons -->
+<section id="skills" class="skills-sec">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="rv">
+      <div class="sec-tag">Expertise</div>
+      <h2 class="sec-h">Skills &amp; <em>Craft</em></h2>
+    </div>
+    <div class="skills-grid">
+
+      <!-- 01 Colour Grading -->
+      <div class="sk-card rv">
+        <div class="sk-num">01</div>
+        <div class="sk-ico-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <div class="sk-name">Colour Grading</div>
+        <p class="sk-desc">Cinematic colour work that builds mood and emotion — from warm golden tones to deep moody cinematic palettes.</p>
+      </div>
+
+      <!-- 02 Cinematic Editing -->
+      <div class="sk-card rv2">
+        <div class="sk-num">02</div>
+        <div class="sk-ico-wrap">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M16 3v18M2 9h6M16 9h6M2 15h6M16 15h6"/></svg>
+        </div>
+        <div class="sk-name">Cinematic Editing</div>
+        <p class="sk-desc">Event films, reels, and short-form edits that flow with rhythm, pacing, and narrative power.</p>
+      </div>
+
+      <!-- 03 Photography -->
+      <div class="sk-card rv3">
+        <div class="sk-num">03</div>
+        <div class="sk-ico-wrap">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <div class="sk-name">Photography</div>
+        <p class="sk-desc">Portrait, event, and lifestyle photography with a refined artistic eye that captures genuine moments.</p>
+      </div>
+
+      <!-- 04 Photo Editing -->
+      <div class="sk-card rv">
+        <div class="sk-num">04</div>
+        <div class="sk-ico-wrap">
+          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </div>
+        <div class="sk-name">Photo Editing</div>
+        <p class="sk-desc">Professional retouching, colour correction, and creative enhancement to a polished professional standard.</p>
+      </div>
+
+      <!-- 05 Social Media Content -->
+      <div class="sk-card rv2">
+        <div class="sk-num">05</div>
+        <div class="sk-ico-wrap">
+          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </div>
+        <div class="sk-name">Social Media Content</div>
+        <p class="sk-desc">Scroll-stopping reels, static posts, and branded content tailored for Instagram, YouTube, and beyond.</p>
+      </div>
+
+      <!-- 06 Memory Frame Works -->
+      <div class="sk-card rv3">
+        <div class="sk-num">06</div>
+        <div class="sk-ico-wrap">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="10" height="10" rx="1"/><path d="M7 17l3-3 2 2 2-3 3 4"/></svg>
+        </div>
+        <div class="sk-name">Memory Frame Works</div>
+        <p class="sk-desc">Custom-designed photo frames that preserve your precious memories as living art for your home forever.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="gline"></div>
+
+<!-- PROCESS -->
+<section id="process" class="process-sec">
+  <div class="process-inner">
+    <div style="text-align:center" class="rv">
+      <div class="sec-tag" style="justify-content:center">How It Works</div>
+      <h2 class="sec-h">The Creative <em>Process</em></h2>
+    </div>
+    <div class="process-grid">
+      <div class="proc-connector"></div>
+      <div class="proc-step rv">
+        <div class="proc-num">I</div>
+        <div class="proc-title">Consultation</div>
+        <p class="proc-desc">We connect and discuss your vision, the story you want to tell, style references, and project goals.</p>
+      </div>
+      <div class="proc-step rv2">
+        <div class="proc-num">II</div>
+        <div class="proc-title">Pre-Production</div>
+        <p class="proc-desc">Planning, concept development, and careful preparation so every shoot and edit runs flawlessly.</p>
+      </div>
+      <div class="proc-step rv3">
+        <div class="proc-num">III</div>
+        <div class="proc-title">The Shoot</div>
+        <p class="proc-desc">The magic unfolds — capturing raw footage and moments with precision, artistry, and intention.</p>
+      </div>
+      <div class="proc-step rv3" style="transition-delay:.4s">
+        <div class="proc-num">IV</div>
+        <div class="proc-title">Final Output</div>
+        <p class="proc-desc">Editing, colour grading, and fine-tuning every detail until your footage is polished and delivered.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="gline"></div>
+
+<!-- SERVICES -->
+<section id="services" class="svc-sec">
+  <div class="svc-inner">
+    <div class="rv">
+      <div class="sec-tag">What I Offer</div>
+      <h2 class="sec-h">Creative <em>Services</em></h2>
+    </div>
+    <div class="svc-grid">
+      <div class="svc-item rv"><div class="svc-no">01</div><div><div class="svc-name">Portrait Photography</div><p class="svc-desc">Individual, couple, and family portrait sessions that capture your authentic self — beautifully lit and artistically composed.</p></div></div>
+      <div class="svc-item rv2"><div class="svc-no">02</div><div><div class="svc-name">Video Editing</div><p class="svc-desc">Full post-production with colour grading, sound design, motion titles, and seamless cuts — for any video format.</p></div></div>
+      <div class="svc-item rv"><div class="svc-no">03</div><div><div class="svc-name">Photo Editing</div><p class="svc-desc">Retouching, background work, colour correction, and creative manipulation to make every image stand out.</p></div></div>
+      <div class="svc-item rv2"><div class="svc-no">04</div><div><div class="svc-name">Event Coverage</div><p class="svc-desc">Complete photo and video coverage of weddings, birthdays, and every celebration that deserves to be remembered.</p></div></div>
+      <div class="svc-item rv"><div class="svc-no">05</div><div><div class="svc-name">Social Media Content</div><p class="svc-desc">Platform-ready reels, stories, and branded content that build your identity and connect with your audience.</p></div></div>
+      <div class="svc-item rv2"><div class="svc-no">06</div><div><div class="svc-name">Memory Frame Works</div><p class="svc-desc">Custom photo frames designed to hold your most treasured moments — a living heirloom crafted for your home wall.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="gline"></div>
+
+<!-- MEMORY FRAMES with real images -->
+<section id="frames" class="frames-sec">
+  <div class="frames-inner">
+    <div class="frames-header rv">
+      <div class="sec-tag">Memory Frames</div>
+      <h2 class="sec-h">Capture a Moment.<br><em>Frame It Forever.</em></h2>
+      <p class="frames-intro">Life's most beautiful moments deserve more than a phone screen. Dario Lensworks crafts bespoke memory frames — custom-sized, artfully designed photo frames that turn your favourite photographs into lasting wall art you'll treasure for generations.</p>
+    </div>
+
+    <div class="frames-main-grid rv2">
+      <!-- Large featured -->
+      <div class="frame-card large">
+        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=85" alt="Wedding Frame" loading="lazy" onload="this.classList.add('loaded')">
+        <div class="frame-overlay"></div>
+        <div class="fc tl"></div><div class="fc tr"></div><div class="fc bl"></div><div class="fc br"></div>
+        <div class="frame-label">
+          <div class="frame-type">Wedding &amp; Couple Frame</div>
+          <div class="frame-desc">Timeless memories, elegantly framed</div>
+        </div>
+      </div>
+      <!-- Top right -->
+      <div class="frame-card" style="min-height:280px">
+        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=700&q=85" alt="Family Frame" loading="lazy" onload="this.classList.add('loaded')" style="height:280px">
+        <div class="frame-overlay"></div>
+        <div class="fc tl"></div><div class="fc tr"></div><div class="fc bl"></div><div class="fc br"></div>
+        <div class="frame-label">
+          <div class="frame-type">Family Portrait Frame</div>
+          <div class="frame-desc">For moments that matter most</div>
+        </div>
+      </div>
+      <!-- Top far right -->
+      <div class="frame-card" style="min-height:280px">
+        <img src="https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=700&q=85" alt="Birthday Frame" loading="lazy" onload="this.classList.add('loaded')" style="height:280px">
+        <div class="frame-overlay"></div>
+        <div class="fc tl"></div><div class="fc tr"></div><div class="fc bl"></div><div class="fc br"></div>
+        <div class="frame-label">
+          <div class="frame-type">Celebration Frame</div>
+          <div class="frame-desc">Birthdays &amp; milestones</div>
+        </div>
+      </div>
+      <!-- Bottom right 1 -->
+      <div class="frame-card" style="min-height:260px">
+        <img src="https://images.unsplash.com/photo-1494774157365-9e04c6720e47?w=700&q=85" alt="Portrait Frame" loading="lazy" onload="this.classList.add('loaded')" style="height:260px">
+        <div class="frame-overlay"></div>
+        <div class="fc tl"></div><div class="fc tr"></div><div class="fc bl"></div><div class="fc br"></div>
+        <div class="frame-label">
+          <div class="frame-type">Classic Portrait Frame</div>
+          <div class="frame-desc">Individual &amp; solo memories</div>
+        </div>
+      </div>
+      <!-- Bottom right 2 -->
+      <div class="frame-card" style="min-height:260px">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=85" alt="Landscape Frame" loading="lazy" onload="this.classList.add('loaded')" style="height:260px">
+        <div class="frame-overlay"></div>
+        <div class="fc tl"></div><div class="fc tr"></div><div class="fc bl"></div><div class="fc br"></div>
+        <div class="frame-label">
+          <div class="frame-type">Landscape &amp; Travel Frame</div>
+          <div class="frame-desc">Nature &amp; adventure memories</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame-cta-strip rv">
+      <div>
+        <div class="fcs-head">Your Memory. Your Wall. Your Forever.</div>
+        <div class="fcs-sub">Send your favourite photo — we design and deliver a custom frame right to your door.</div>
+      </div>
+      <a href="#contact" class="btn-primary" style="white-space:nowrap;display:inline-block">Order a Frame</a>
+    </div>
+  </div>
+</section>
+
+<div class="gline"></div>
+
+<!-- CONTACT -->
+<section id="contact" class="contact-sec">
+  <div class="contact-inner">
+    <div class="contact-top rv">
+      <div class="sec-tag" style="justify-content:center">Let's Create</div>
+      <h2 class="sec-h" style="text-align:center">Get In <em>Touch</em></h2>
+      <p class="contact-lead">Ready to bring your vision to life? Whether it's a film, a frame, or a brand — reach out through any channel. We respond fast and love talking about creative projects.</p>
+    </div>
+    <div class="contact-grid rv2">
+      <a href="tel:+918940983115" class="con-card">
+        <div class="con-ico">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+        </div>
+        <div class="con-type">Phone · WhatsApp</div>
+        <div class="con-val">+91 89409 83115</div>
+        <div class="con-badge">Available on WhatsApp</div>
+      </a>
+      <a href="https://instagram.com/dariolensworks" target="_blank" class="con-card">
+        <div class="con-ico">
+          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </div>
+        <div class="con-type">Instagram</div>
+        <div class="con-val">@dariolensworks</div>
+      </a>
+      <a href="mailto:dariolensworks@gmail.com" class="con-card" style="border-right:none">
+        <div class="con-ico">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="con-type">Email</div>
+        <div class="con-val">dariolensworks@gmail.com</div>
+      </a>
+    </div>
+    <div class="contact-map-note rv3">
+      <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <p>Based in <span>Tirunelveli, Tamil Nadu</span> — Available across India. Remote editing available <span>Worldwide.</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">Dario Lensworks</div>
+  <div class="foot-mid">
+    <div class="foot-name">Freelance Creative Studio · Tirunelveli</div>
+    <div class="foot-cr">© 2025 Dario Lensworks · All Rights Reserved</div>
+  </div>
+  <div class="foot-socials">
+    <a href="https://instagram.com/dariolensworks" target="_blank">Instagram</a>
+    <a href="mailto:dariolensworks@gmail.com">Email</a>
+    <a href="tel:+918940983115">WhatsApp</a>
+  </div>
+</footer>
+
+<script>
+// Cursor
+const cur=document.getElementById('cur'),curR=document.getElementById('cur-r');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+(function loop(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(loop);})();
+
+// Scroll reveal
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on');});},{threshold:.1});
+document.querySelectorAll('.rv,.rv2,.rv3').forEach(el=>obs.observe(el));
+
+// Hero parallax
+const heroImg=document.querySelector('.hero-img');
+window.addEventListener('scroll',()=>{if(heroImg)heroImg.style.transform=`translateY(${window.scrollY*.3}px)`;});
+</script>
+</body>
+</html>
